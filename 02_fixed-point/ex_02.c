@@ -3,16 +3,16 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define FRACTION_BITS 8
-
-int32_t fp2fx (float_t a, int32_t n)
-{
-	
-}
+#define FRACTION_BITS 10
 
 float_t fx2fp (int32_t X, int32_t n)
 {
-	
+	return (float_t)X / (1 << n);
+}
+
+int32_t fp2fx (float_t a, int32_t n)
+{
+	return (int32_t)(a * (1 << n));
 }
 
 int main(void)
