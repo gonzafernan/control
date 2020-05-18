@@ -33,7 +33,7 @@ signal = x1 + 0.1 * x2;
 
 SNR = 60;
 
-signal_n = my_noise (signal, SNR);
+signal_n = awgn (signal, SNR);
 
 %% IIR
 
