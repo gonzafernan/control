@@ -23,16 +23,16 @@ B = [a*v0/b v0/b]';
 C = [1 0];
 D = 0;
 
-Ag = [A zeros(2,1); C zeros(1) ]
-Bg = [B; 0]
-Cg = [0 1 0];
+Au = [A zeros(2,1); C zeros(1) ]
+Bu = [B; 0]
+Cu = [0 1 0];
 H = [0 0 -1]';
 
 %---------------------------------------------------
 % Reachability
 %---------------------------------------------------
 
-Wr = [Bg (Ag * Bg) (Ag^(2) * Bg) ];
+Wr = [Bu (Au * Bu) (Au^(2) * Bu) ];
 
 r = rank(Wr);
 
@@ -52,7 +52,7 @@ end
 
 syms s real
 
-CP = det(s*eye(3) - Ag)
+CP = det(s*eye(3) - Au)
 
 % Since CP = s^3 = ... 
 %          = s^n + a1 s^(n-1) + a2 s^(n-2) + ... + an
@@ -63,23 +63,24 @@ a3 = 0;
 ap = [a1 a2 a3];
 
 %---------------------------------------------------
-% Desired Characteristic polynomial
+% Desired characteristic polynomial
 %---------------------------------------------------
 
-zeta = 0.77;
-wn = 3.44;
+zeta=1;
+wn=4;
+
 pi = 3*wn*zeta;
 
 DP = (s+pi) * (s^2 + 2 * zeta * wn * s + wn^2);
 
 collect(simplify(DP))
 
-% Since DP = s^3 + 5*s^2 + 7*s + 3 = ... 
-%          = s^n + p1 s^(n-1) + p2 s^(n-2) + ... + pn
+% DP = s^3 + (3311*s^2)/250 + (42133163*s)/781250 + 36732234/390625
+%    = s^n + p1 s^(n-1) + p2 s^(n-2) + ... + pn
 
-p1 = 5;
-p2 = 7;
-p3 = 3;
+p1 = (3311)/250 ;
+p2 = (42133163)/781250;
+p3 = 36732234/390625;
 
 p = [p1 p2 p3];
 
@@ -89,10 +90,9 @@ p = [p1 p2 p3];
 
 Wr_tilde = [1 a1 a2; 0 1 a1; 0 0 1 ]^(-1);
 
-K = [p - ap] * Wr_tilde * Wr^(-1)
+Ku = (p - ap) * Wr_tilde * Wr^(-1)
 
-A1 = Ag - (Bg * K);
-kr = 1; % -(Cg * (A1)^(-1) * Bg)^(-1)
+A1 = Au - (Bu * Ku);
 
 %---------------------------------------------------
 % Closed-loop poles
@@ -100,21 +100,20 @@ kr = 1; % -(Cg * (A1)^(-1) * Bg)^(-1)
 
 % Check if poles are corectly placed.
 
-clp = eig(A1)
+poles = eig(A1)
 
 %---------------------------------------------------
 % Simulink, Step response
 %---------------------------------------------------
 
-% Chance matrices C and D for Simulink
-A = Ag;
-B = Bg;
-C = eye(3);
-D = [0 0 0]';
+% Change matrices for Simulink
+C = eye(2);
+D = [0 0]';
 
-time = 0:0.1:30;
-
-sim('VehicleSteering.mdl', time)
+TStart = 0;
+TFinal = 30;
+ 
+time = sim('VehicleSteering_sim_Int.slx', [TStart TFinal] );
 
 %---------------------------------------------------
 % Plot
@@ -126,9 +125,9 @@ title ('Control signal')
 grid on
 
 figure
-plot (time, x1.signals(1).values)
+plot (time, x1.signals(1).values, '--')
 hold on
 plot (time, x1.signals(2).values)
 title ('Lateral position')
 grid on
-
+legend('Reference', 'Lateral position')
