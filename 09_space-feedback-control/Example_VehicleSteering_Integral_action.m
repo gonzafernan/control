@@ -114,7 +114,7 @@ D = [0 0 0]';
 
 time = 0:0.1:30;
 
-sim('VehicleSteering_sim.slx', time)
+sim('VehicleSteering.mdl', time)
 
 %---------------------------------------------------
 % Plot
