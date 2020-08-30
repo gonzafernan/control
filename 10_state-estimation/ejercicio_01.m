@@ -35,7 +35,7 @@ DP = collect(DP)
 k1 = 16;
 k2 = 8 - 1;  
 
-kr = -(C * (A)^(-1) * B)^(-1);
+kr = -inv(C*inv(A - B*K)*B)
 
 K = [k1 k2];
 
